@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.springbootdemo.model.Developer;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,19 +18,20 @@ import java.util.*;
 @RestController
 public class WebController {
 
-    String owner = null;
-    String repo = null;
+  String owner = null;
+  String repo = null;
 
 //    @GetMapping("/repo")
-//    public void postRepo(@RequestParam("OWNER") String owner, @RequestParam("REPO") String repo, @PathVariable String OWNER, @PathVariable String REPO){
+//    public void postRepo(@RequestParam("OWNER") String owner, @RequestParam("REPO") String repo,
+//    @PathVariable String OWNER, @PathVariable String REPO){
 //        this.owner = owner;
 //        this.repo = repo;
 //        System.out.println(repo);
-//    }
-
+    //    }
     @GetMapping("/committers")
     public ArrayList<Object> getCommitters() {
-        String s = readFile("D:\\java\\projectf\\SpringBootDemo\\SpringBootDemo\\src\\main\\java\\com\\example\\springbootdemo\\repository\\socketio\\commits_data2.txt");
+        String s = readFile("D:\\java\\projectf\\SpringBootDemo\\SpringBootDemo\\src\\main\\java" +
+                "\\com\\example\\springbootdemo\\repository\\socketio\\commits_data2.txt");
         List<JSONObject> objects = JSONArray.parseArray(s, JSONObject.class);
         System.out.println(objects.size());
         ArrayList<JSONObject> commits = new ArrayList<>(objects);
@@ -60,7 +60,7 @@ public class WebController {
                         String repos_url = commit.getJSONObject("author").get("repos_url").toString();
                         String id = commit.getJSONObject("author").get("id").toString();
                         String login = commit.getJSONObject("author").get("login").toString();
-                        Developer developer = new Developer(name, email, repos_url, id, "https://github.com/" + login +".png");
+                        Developer developer = new Developer(name, email, repos_url, id, "https://github.com/" + login + ".png");
                         developers.add(developer);
                         break;
                     }
@@ -90,7 +90,7 @@ public class WebController {
 //            return sb.toString();
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
-//        }
+        //        }
 
         StringBuilder strSb = new StringBuilder();
         InputStreamReader inStrR;
@@ -100,7 +100,7 @@ public class WebController {
             String line;
             line = br.readLine();
             while (line != null) {
-                if(!line.equals("][")){
+                if (!line.equals("][")) {
                     strSb.append(line).append("\r\n");
 
                 }
@@ -119,7 +119,8 @@ public class WebController {
         List<JSONObject> open_issues = JSONArray.parseArray(s, JSONObject.class);
         int open_number = open_issues.size();
 
-        String s1 = readFile("D:\\java\\projectf\\SpringBootDemo\\SpringBootDemo\\src\\main\\java\\com\\example\\springbootdemo\\repository\\socketio\\closed_issues.txt");
+        String s1 = readFile("D:\\java\\projectf\\SpringBootDemo\\SpringBootDemo\\src\\main" +
+                "\\java\\com\\example\\springbootdemo\\repository\\socketio\\closed_issues.txt");
         List<JSONObject> closed_issues = JSONArray.parseArray(s1, JSONObject.class);
         int closed_number = closed_issues.size();
 
@@ -153,23 +154,23 @@ public class WebController {
             //return (o1.getKey()).toString().compareTo(o2.getKey());
         });
 
-        int count = 0;//总个数
-        double sum = 0;//总和
-        double average;//平均数
-        double Dev;//总体方差
+        int count = 0; //总个数
+        double sum = 0; //总和
+        double average; //平均数
+        double Dev; //总体方差
         count = minuteList.size();
         for (Long aLong : minuteList) {
             sum += aLong;
         }
         //求平均数
-        average = sum/minuteList.size();
+        average = sum / minuteList.size();
         DecimalFormat df = new DecimalFormat(".000");
-        double dsum=0;
+        double dsum = 0;
         for (Long aLong : minuteList) {
             double ss = aLong - average;
             dsum += Math.pow(ss, 2);
         }
-        Dev = dsum / (minuteList.size()-1);
+        Dev = dsum / (minuteList.size() - 1);
 
         Long max = Collections.max(minuteList);
         Long min = Collections.min(minuteList);
@@ -181,32 +182,32 @@ public class WebController {
         typical.put("方差", Dev);
 
         ArrayList<String> topic_list = new ArrayList<>();
-        for (JSONObject open_issue: open_issues) {
+        for (JSONObject open_issue : open_issues) {
             String title = open_issue.get("title").toString();
             topic_list.add(title);
             String labels = open_issue.getJSONArray("labels").toString();
             List<JSONObject> labelObject = JSONArray.parseArray(labels, JSONObject.class);
-            for (JSONObject label: labelObject) {
+            for (JSONObject label : labelObject) {
                 String description = label.get("description").toString();
                 topic_list.add(description);
             }
         }
         String s2 = readFile("D:\\java\\projectf\\SpringBootDemo\\SpringBootDemo\\src\\main\\java\\com\\example\\springbootdemo\\repository\\socketio\\issues_comments.txt");
         List<JSONObject> issues_comments = JSONArray.parseArray(s2, JSONObject.class);
-        for (JSONObject issues_comment: issues_comments) {
+        for (JSONObject issues_comment : issues_comments) {
             String comment = issues_comment.get("body").toString();
             topic_list.add(comment);
         }
 
         HashMap<String, Integer> topicMap = new HashMap<>();
-        String[] notImportantWords = new String[]{"","the","to","I","a","it","this","is",
-                "and","on","in","for","of","that","you","with","at","be","not","s","have",
-                "but","as","or","if","can","are","from","using","m","just","was","will","so","my",
-                "1","0","2","3","4","5","6","7","8","9"};
+        String[] notImportantWords = new String[]{"", "the", "to", "I", "a", "it", "this", "is", 
+                "and", "on", "in", "for", "of", "that", "you", "with", "at", "be", "not", "s", "have", 
+                "but", "as", "or", "if", "can", "are", "from", "using", "m", "just", "was", "will", "so", "my", 
+                "1", "0", "2", "3", "4", "5", "6", "7", "8", "9"};
         System.out.println(notImportantWords.length);
-        for (String topic: topic_list) {
+        for (String topic : topic_list) {
             String[] split = topic.replaceAll("\\W", " ").split(" ");
-            for (String splitString: split) {
+            for (String splitString : split) {
                 boolean notImportant = false;
                 for (String notImportantWord : notImportantWords) {
                     if (splitString.equals(notImportantWord)) {
@@ -235,7 +236,7 @@ public class WebController {
 
         ArrayList<String> names = new ArrayList<>();
         ArrayList<Integer> values = new ArrayList<>();
-        for (Map.Entry<String, Integer> entry: topicEntry) {
+        for (Map.Entry<String, Integer> entry : topicEntry) {
             names.add(entry.getKey());
             values.add(entry.getValue());
         }
@@ -259,16 +260,16 @@ public class WebController {
 
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(date2);
-        int day1= cal1.get(Calendar.DAY_OF_YEAR);
+        int day1 = cal1.get(Calendar.DAY_OF_YEAR);
         int day2 = cal2.get(Calendar.DAY_OF_YEAR);
 
         int year1 = cal1.get(Calendar.YEAR);
         int year2 = cal2.get(Calendar.YEAR);
-        if(year1 != year2) {//同一年
+        if (year1 != year2)  {//同一年
             int timeDistance = 0 ;
-            for(int i = year1 ; i < year2 ; i ++)
+            for (int i = year1; i < year2; i++)
             {
-                if(i%4==0 && i%100!=0 || i%400==0)    //闰年
+                if (i % 4 == 0 && i % 100 !=0 || i % 400 == 0)    //闰年
                 {
                     timeDistance += 366;
                 }
@@ -278,9 +279,9 @@ public class WebController {
                 }
             }
 
-            return timeDistance + (day2-day1) ;
-        } else {// 不同年
-            return day2-day1;
+            return timeDistance + (day2 - day1) ;
+        } else  {// 不同年
+            return day2 - day1;
         }
     }
 
@@ -302,7 +303,7 @@ public class WebController {
                 Date release_date = simpleDateFormat.parse(release_time);
 
                 int commit_number = 0;
-                for (JSONObject commit: commits) {
+                for (JSONObject commit : commits) {
                     String commit_time = commit.getJSONObject("commit").getJSONObject("author").get("date").toString().replaceAll("[a-zA-Z]", " ");
                     Date commit_date = simpleDateFormat.parse(commit_time);
                     if (i == 0) {
@@ -313,8 +314,8 @@ public class WebController {
                         if (commit_date.before(release_date)) {
                             commit_number++;
                         }
-                    } else{
-                        String last_release_time = releases.get(i+1).get("published_at").toString().replaceAll("[a-zA-Z]", " ");
+                    } else {
+                        String last_release_time = releases.get(i + 1).get("published_at").toString().replaceAll("[a-zA-Z]", " ");
                         Date last_release_date = simpleDateFormat.parse(last_release_time);
                         if (commit_date.before(release_date) && commit_date.after(last_release_date)) {
                             commit_number++;
@@ -326,10 +327,10 @@ public class WebController {
 
                 if (i == 0) {
                     commit_number = 0;
-                    for (JSONObject commit: commits) {
+                    for (JSONObject commit : commits) {
                         String commit_time = commit.getJSONObject("commit").getJSONObject("author").get("date").toString().replaceAll("[a-zA-Z]", " ");
                         Date commit_date = simpleDateFormat.parse(commit_time);
-                        String last_release_time = releases.get(i+1).get("published_at").toString().replaceAll("[a-zA-Z]", " ");
+                        String last_release_time = releases.get(i + 1).get("published_at").toString().replaceAll("[a-zA-Z]", " ");
                         Date last_release_date = simpleDateFormat.parse(last_release_time);
                         if (commit_date.before(release_date) && commit_date.after(last_release_date)) {
                             commit_number++;
@@ -349,7 +350,7 @@ public class WebController {
         HashMap<String, Integer> quarter_commits = new HashMap<>();
         HashMap<String, Integer> week_commits = new HashMap<>();
         HashMap<String, Integer> day_commits = new HashMap<>();
-        for (JSONObject commit: commits) {
+        for (JSONObject commit : commits) {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String commit_time = commit.getJSONObject("commit").getJSONObject("author").get("date").toString().replaceAll("[a-zA-Z]", " ");
             Date commit_date;
@@ -508,13 +509,13 @@ public class WebController {
         }
 
 
-        ArrayList<Integer> yData=new ArrayList<>();
+        ArrayList<Integer> yData = new ArrayList<>();
         yData.add(quarter_commits.get("第一季度"));
         yData.add(quarter_commits.get("第二季度"));
         yData.add(quarter_commits.get("第三季度"));
         yData.add(quarter_commits.get("第四季度"));
 
-        ArrayList<Integer> week=new ArrayList<>();
+        ArrayList<Integer> week = new ArrayList<>();
         week.add(week_commits.get("周一"));
         week.add(week_commits.get("周二"));
         week.add(week_commits.get("周三"));
@@ -524,7 +525,7 @@ public class WebController {
         week.add(week_commits.get("周日"));
 
 
-        ArrayList<Integer> day=new ArrayList<>();
+        ArrayList<Integer> day = new ArrayList<>();
         day.add(day_commits.get("上午"));
         day.add(day_commits.get("中午"));
         day.add(day_commits.get("下午"));
